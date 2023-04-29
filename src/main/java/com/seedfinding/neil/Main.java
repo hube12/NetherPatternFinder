@@ -74,7 +74,7 @@ public class Main {
                 boolean placed = false;
                 for (int y = minHeight; y < generator.getMaxWorldHeight() - 1; y++) {
                     if (column[y]==Blocks.NETHERRACK && Block.IS_AIR.test(VERSION, column[y + 1])) {
-                        POSITIONS.add(new BPos(offsetX + x, y, offsetY + z));
+                        POSITIONS.add(new BPos(offsetX + x, y+1, offsetY + z));
                         System.out.print(y + " ");
                         placed = true;
                         break;
@@ -99,8 +99,8 @@ public class Main {
                 System.err.printf("Critical error, data inputted is above the range 0-%d (was %d)", blocks.length, pos.getY());
                 System.exit(-1);
             }
-            Block airBlock = blocks[pos.getY()+1];
-            Block netherackBlock = blocks[pos.getY()];
+            Block airBlock = blocks[pos.getY()];
+            Block netherackBlock = blocks[pos.getY()-1];
             if (!Block.IS_AIR.test(VERSION, airBlock) || netherackBlock != Blocks.NETHERRACK) {
                 return;
             }
