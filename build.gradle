@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id "application"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id 'edu.sc.seis.launch4j' version '2.5.0'
+}
+group 'com.seedfinding.neil'
+
+defaultTasks 'clean', 'release', 'run'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+    google()
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url "https://maven.latticg.com/"
+    }
+    maven {
+        url "https://maven.seedfinding.com/"
+    }
+    maven {
+        url "https://maven-snapshots.seedfinding.com/"
+    }
+}
+
+
+dependencies {
+    implementation('com.seedfinding:mc_math:1.171.0') { transitive = false }
+    implementation('com.seedfinding:mc_seed:1.171.1') { transitive = false }
+    implementation('com.seedfinding:mc_core:1.192.1') { transitive = false }
+    implementation('com.seedfinding:mc_noise:1.171.1') { transitive = false }
+
+    implementation('com.seedfinding:mc_biome:1.171.1') { transitive = false }
+    implementation('com.seedfinding:mc_terrain:1.171.1') { transitive = false }
+    implementation('com.seedfinding:mc_feature:1.171.1') { transitive = false }
+
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.2')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.4.2')
+}
+
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+application {
+    mainClass.set("com.seedfinding.neil.Main")
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+        maxHeapSize = "1G"
+    }
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        outputs.upToDateWhen { false }
+        showStandardStreams = true
+        showExceptions true
+        showCauses true
+        showStackTraces true
+    }
+}
+
+
+shadowJar {
+    archiveFileName = "${project.name}-${project.version}.jar"
+}
+
+launch4j {
+    outfile = "${project.name}-${project.version}.exe"
+    outputDir = "libs"
+    supportUrl = "https://github.com/hube12"
+    jvmOptions = ["-Xms256M", "-Xmx8G"]
+    initialHeapPercent = 5
+    maxHeapPercent = 80
+    jarTask = project.tasks.shadowJar
+    productName = "${project.name}"
+    fileDescription = "A fast enough nether ocean cracker"
+    copyConfigurable = [] // don't copy lib
+    libraryDir= "ignore_libs"
+    dontWrapJar=false
+    headerType="console"
+}
+
+task("release"){
+    dependsOn(shadowJar)
+    dependsOn(createExe)
+}
